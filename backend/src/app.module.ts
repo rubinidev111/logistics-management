@@ -13,30 +13,27 @@ import { PaymentsModule } from './modules/payments/payments.module.js';
 // import { HealthModule } from './health/health.module.js';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import configuration from './config/configuration.js';
 
 @Module({
   imports: [
      ConfigModule.forRoot({
       isGlobal: true,
+       load: [configuration],
     }),
-     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-
-        host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USERNAME'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_DATABASE'),
-
-        autoLoadEntities: true,
-
-        synchronize: false,
-      }),
-    }),
+    TypeOrmModule.forRootAsync({
+  inject: [ConfigService],
+  useFactory: (configService: ConfigService) => ({
+    type: 'mysql',
+    host: configService.getOrThrow<string>('database.host'),
+    port: configService.getOrThrow<number>('database.port'),
+    username: configService.getOrThrow<string>('database.username'),
+    password: configService.getOrThrow<string>('database.password'),
+    database: configService.getOrThrow<string>('database.database'),
+    autoLoadEntities: true,
+    synchronize: false, // Set to false in production to avoid data loss
+  }),
+}),
     AuthModule, UsersModule, CustomersModule, BookingsModule, ShipmentsModule, DriversModule, VehiclesModule, TrackingModule, PaymentsModule  
   ],
   controllers: [AppController],

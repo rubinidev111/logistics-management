@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
@@ -9,12 +9,14 @@ import { UpdateUserDto } from './dto/update-user.dto.js';
 
 @Injectable()
 export class UsersService {
+    private readonly logger = new Logger(UsersService.name);
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
+    this.logger.log(`Creating user with email: ${createUserDto.email}`);
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
     const user = this.userRepository.create({
@@ -45,6 +47,7 @@ export class UsersService {
 }
 
 async findOne(id: number) {
+  this.logger.log(`Fetching user: ${id}`);
   const user = await this.userRepository.findOne({
     where: { id },
     select: {
@@ -108,5 +111,18 @@ async remove(id: number) {
   return {
     message: 'User deleted successfully',
   };
+}
+async findByEmail(email: string) {
+  return this.userRepository.findOne({
+    where: { email },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      password: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
 }
 }
