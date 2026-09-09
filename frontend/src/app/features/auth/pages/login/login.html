@@ -1,0 +1,101 @@
+<div class="login-container">
+
+  <div class="login-card">
+
+    <h1>Logistics Management</h1>
+
+    <p>Sign in to continue</p>
+
+    @if (errorMessage()) {
+      <div class="error-message">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <form
+      [formGroup]="loginForm"
+      (ngSubmit)="onSubmit()"
+    >
+
+      <div class="form-field">
+
+        <label for="email">
+          Email
+        </label>
+
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="Enter your email"
+        />
+
+        @if (
+          loginForm.controls.email.touched &&
+          loginForm.controls.email.hasError('required')
+        ) {
+          <small>
+            Email is required
+          </small>
+        }
+
+        @if (
+          loginForm.controls.email.touched &&
+          loginForm.controls.email.hasError('email')
+        ) {
+          <small>
+            Please enter a valid email
+          </small>
+        }
+
+      </div>
+
+      <div class="form-field">
+
+        <label for="password">
+          Password
+        </label>
+
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="Enter your password"
+        />
+
+        @if (
+          loginForm.controls.password.touched &&
+          loginForm.controls.password.hasError('required')
+        ) {
+          <small>
+            Password is required
+          </small>
+        }
+
+        @if (
+          loginForm.controls.password.touched &&
+          loginForm.controls.password.hasError('minlength')
+        ) {
+          <small>
+            Password must be at least 8 characters
+          </small>
+        }
+
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="isLoading()"
+      >
+        @if (isLoading()) {
+          Signing in...
+        } @else {
+          Login
+        }
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
